@@ -108,7 +108,7 @@ python extract_hidden_states.py \
   --data_path ./results \
   --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name llama8b_smoke10 \
+  --save_name llama8b_demo10 \
   --perturb_modes regular \
   --prompt regular \
   --sample_num 10 \
@@ -124,7 +124,7 @@ python extract_hidden_states.py \
   --data_path ./results \
   --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name llama8b_smoke10 \
+  --save_name llama8b_demo10 \
   --perturb_modes regular \
   --prompt context \
   --sample_num 10
@@ -138,7 +138,7 @@ python extract_hidden_states.py \
   --data_path ./results \
   --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name llama8b_smoke10 \
+  --save_name llama8b_demo10 \
   --perturb_modes regular \
   --prompt honesty \
   --sample_num 10
@@ -154,7 +154,7 @@ python extract_hidden_states.py \
   --easy_context_path ./easy_contexts \
   --easy_context_name llama8b_qasper_train_easy_contexts.pkl \
   --save_path ./hidden_states \
-  --save_name llama8b_smoke10 \
+  --save_name llama8b_demo10 \
   --perturb_modes easy_context \
   --prompt regular \
   --sample_num 10
@@ -166,17 +166,17 @@ python extract_hidden_states.py \
 python run_feature_gaps.py \
   --hidden_states_path ./hidden_states \
   --train_files \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_['easy_context']" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_context_['regular']" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_honesty_['regular']" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_['easy_context']" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_context_['regular']" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_honesty_['regular']" \
   --val_files \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --test_files \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --train_num 10 \
   --val_num 10 \
   --test_num 10 \
@@ -189,9 +189,9 @@ python run_feature_gaps.py \
 ```bash
 python run_saplma.py \
   --hidden_states_path ./hidden_states \
-  --train_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-  --val_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
-  --test_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+  --train_file "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+  --val_file "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+  --test_file "llama8b_demo10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --train_num 10 \
   --val_num 10 \
   --test_num 10 \
