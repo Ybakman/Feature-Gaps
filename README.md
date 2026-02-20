@@ -31,12 +31,32 @@ Run in this order:
 - `datasets/`: input datasets.
 - `results/`, `hidden_states/`, `easy_contexts/`, `uq_results/`: generated outputs.
 
-## Environment
+## Conda Setup (From Scratch)
+
+### Option A: One-command setup (recommended)
 
 ```bash
-cd /home/yavuz/yavuz/feature_gaps
-source /home/yavuz/miniconda3/etc/profile.d/conda.sh
-conda activate /home/yavuz/miniconda3/envs/TruthTorchLLM
+git clone https://github.com/Ybakman/Feature-Gaps.git
+cd Feature-Gaps
+bash setup_conda.sh
+conda activate feature-gaps
+mkdir -p results uq_results hidden_states easy_contexts
+```
+
+Notes:
+- `setup_conda.sh` creates a new conda env and installs all required packages.
+- Default env name is `feature-gaps`.
+- To change env name: `ENV_NAME=myenv bash setup_conda.sh`
+- To install CPU-only PyTorch: `WITH_CUDA=0 bash setup_conda.sh`
+
+### Option B: Manual setup
+
+```bash
+conda create -y -n feature-gaps python=3.10
+conda activate feature-gaps
+python -m pip install --upgrade pip
+python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+python -m pip install truthtorchlm transformers datasets accelerate sentencepiece scikit-learn tqdm vllm
 mkdir -p results uq_results hidden_states easy_contexts
 ```
 
