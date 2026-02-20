@@ -1,4 +1,6 @@
-# Feature-Gaps
+# Uncertainty as Feature Gaps: Epistemic Uncertainty Quantification of LLMs in Contextual Question-Answering ICLR-2026
+
+![Feature-Gaps Overview](assets/feature_gaps_overview.png)
 
 Official code for the paper experiments on uncertainty estimation in RAG-style QA using:
 - baseline TruthTorchLM UQ methods,
@@ -7,17 +9,6 @@ Official code for the paper experiments on uncertainty estimation in RAG-style Q
 - LookbackLens.
 
 This repository is organized as a strict step-by-step pipeline.
-
-## Pipeline Order
-
-Run in this order:
-1. `run_model.py`
-2. `run_uq.py`
-3. `easy_context.py`
-4. `extract_hidden_states.py`
-5. `run_feature_gaps.py`
-6. `run_saplma.py`
-7. `run_lookbacklens.py`
 
 ## Repository Layout
 
@@ -49,17 +40,6 @@ Notes:
 - To change env name: `ENV_NAME=myenv bash setup_conda.sh`
 - To install CPU-only PyTorch: `WITH_CUDA=0 bash setup_conda.sh`
 
-### Option B: Manual setup
-
-```bash
-conda create -y -n feature-gaps python=3.10
-conda activate feature-gaps
-python -m pip install --upgrade pip
-python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-python -m pip install truthtorchlm transformers datasets accelerate sentencepiece scikit-learn tqdm vllm
-mkdir -p results uq_results hidden_states easy_contexts
-```
-
 Fill `api_values.env` before running `run_model.py`:
 
 ```env
@@ -74,22 +54,22 @@ HF_HOME=/home/yavuz/yavuz/.cache/huggingface/
 Purpose:
 - Generates dataset-level outputs consumed by all later stages.
 
-Command (paper-style default, 10-sample smoke):
+Command (real Llama example, 10-sample smoke):
 
 ```bash
 python run_model.py \
   --api_env_file ./api_values.env \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./datasets \
   --dataset_name qasper.pkl \
   --dataset_size 10 \
   --save_path ./results \
-  --save_name run_model_qasper_10 \
+  --save_name run_model_llama8b_qasper_10 \
   --model_judge gpt-4o-mini
 ```
 
 Expected output:
-- `results/run_model_qasper_10.pkl`
+- `results/run_model_llama8b_qasper_10.pkl`
 
 ## Section B: TruthTorchLM Baseline UQ (Step 2)
 
@@ -98,18 +78,18 @@ Purpose:
 
 ```bash
 python run_uq.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./results \
-  --dataset_name run_model_qasper_10.pkl \
+  --dataset_name run_model_llama8b_qasper_10.pkl \
   --save_path ./uq_results \
-  --save_name run_uq_qasper_10 \
+  --save_name run_uq_llama8b_qasper_10 \
   --number_of_generations 1 \
   --entailment_model microsoft/deberta-base-mnli \
   --entailment_device cuda:0
 ```
 
 Expected output:
-- `uq_results/run_uq_qasper_10.pkl`
+- `uq_results/run_uq_llama8b_qasper_10.pkl`
 
 ## Section C: Easy-Context Generation (Step 3)
 
@@ -140,11 +120,11 @@ Run all four variants.
 
 ```bash
 python extract_hidden_states.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./results \
-  --data_name run_model_qasper_10.pkl \
+  --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name qwen_smoke10 \
+  --save_name llama8b_smoke10 \
   --perturb_modes regular \
   --prompt regular \
   --sample_num 10 \
@@ -156,11 +136,11 @@ python extract_hidden_states.py \
 
 ```bash
 python extract_hidden_states.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./results \
-  --data_name run_model_qasper_10.pkl \
+  --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name qwen_smoke10 \
+  --save_name llama8b_smoke10 \
   --perturb_modes regular \
   --prompt context \
   --sample_num 10
@@ -170,11 +150,11 @@ python extract_hidden_states.py \
 
 ```bash
 python extract_hidden_states.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./results \
-  --data_name run_model_qasper_10.pkl \
+  --data_name run_model_llama8b_qasper_10.pkl \
   --save_path ./hidden_states \
-  --save_name qwen_smoke10 \
+  --save_name llama8b_smoke10 \
   --perturb_modes regular \
   --prompt honesty \
   --sample_num 10
@@ -184,13 +164,13 @@ python extract_hidden_states.py \
 
 ```bash
 python extract_hidden_states.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --data_path ./results \
-  --data_name run_model_qasper_10.pkl \
+  --data_name run_model_llama8b_qasper_10.pkl \
   --easy_context_path ./easy_contexts \
   --easy_context_name llama8b_qasper_train_easy_contexts.pkl \
   --save_path ./hidden_states \
-  --save_name qwen_smoke10 \
+  --save_name llama8b_smoke10 \
   --perturb_modes easy_context \
   --prompt regular \
   --sample_num 10
@@ -202,22 +182,22 @@ python extract_hidden_states.py \
 python run_feature_gaps.py \
   --hidden_states_path ./hidden_states \
   --train_files \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_['easy_context']" \
-    "qwen_smoke10_run_model_qasper_10.pkl_context_['regular']" \
-    "qwen_smoke10_run_model_qasper_10.pkl_honesty_['regular']" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_['easy_context']" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_context_['regular']" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_honesty_['regular']" \
   --val_files \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --test_files \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-    "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+    "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --train_num 10 \
   --val_num 10 \
   --test_num 10 \
   --output_path ./uq_results \
-  --save_name feature_gaps_qasper_10.pkl
+  --save_name feature_gaps_llama8b_qasper_10.pkl
 ```
 
 ## Section F: SAPLMA (Step 6)
@@ -225,27 +205,27 @@ python run_feature_gaps.py \
 ```bash
 python run_saplma.py \
   --hidden_states_path ./hidden_states \
-  --train_file "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-  --val_file "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
-  --test_file "qwen_smoke10_run_model_qasper_10.pkl_regular_[]" \
+  --train_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+  --val_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
+  --test_file "llama8b_smoke10_run_model_llama8b_qasper_10.pkl_regular_[]" \
   --train_num 10 \
   --val_num 10 \
   --test_num 10 \
   --output_path ./uq_results \
-  --save_name saplma_qasper_10.pkl
+  --save_name saplma_llama8b_qasper_10.pkl
 ```
 
 ## Section G: LookbackLens (Step 7)
 
 ```bash
 python run_lookbacklens.py \
-  --model_name Qwen/Qwen2.5-0.5B-Instruct \
+  --model_name meta-llama/Llama-3.1-8B-Instruct \
   --results_path ./results \
-  --train_results_file run_model_qasper_10.pkl \
-  --test_results_file run_model_qasper_10.pkl \
+  --train_results_file run_model_llama8b_qasper_10.pkl \
+  --test_results_file run_model_llama8b_qasper_10.pkl \
   --train_num_samples 10 \
   --output_path ./uq_results \
-  --save_name lookbacklens_qasper_10.pkl
+  --save_name lookbacklens_llama8b_qasper_10.pkl
 ```
 
 ## Validation Status (This Machine)
