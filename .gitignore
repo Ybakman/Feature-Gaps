@@ -1,0 +1,21 @@
+# Data and generated artifacts
+datasets/
+easy_contexts/
+hidden_states/
+results/
+uq_results/
+
+# Secrets
+api_values.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
