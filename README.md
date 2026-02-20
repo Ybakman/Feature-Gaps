@@ -1,8 +1,16 @@
-# Feature Gaps Workflow (Single Guide)
+# Feature-Gaps
 
-This document is the single source of truth for running the pipeline.
+Official code for the paper experiments on uncertainty estimation in RAG-style QA using:
+- baseline TruthTorchLM UQ methods,
+- `feature_gaps`,
+- SAPLMA,
+- LookbackLens.
 
-Run order:
+This repository is organized as a strict step-by-step pipeline.
+
+## Pipeline Order
+
+Run in this order:
 1. `run_model.py`
 2. `run_uq.py`
 3. `easy_context.py`
@@ -11,9 +19,19 @@ Run order:
 6. `run_saplma.py`
 7. `run_lookbacklens.py`
 
-The default values below use real run-style settings already used in this project (Mistral/Llama/Qasper-style setup).
+## Repository Layout
 
-## 0) Environment Setup
+- `run_model.py`: generates base model outputs + correctness labels.
+- `run_uq.py`: runs TruthTorchLM uncertainty methods over step-1 output.
+- `easy_context.py`: generates easy-context perturbation text.
+- `extract_hidden_states.py`: produces hidden-state artifacts for downstream methods.
+- `run_feature_gaps.py`: runs the feature-gaps method.
+- `run_saplma.py`: runs SAPLMA.
+- `run_lookbacklens.py`: runs LookbackLens.
+- `datasets/`: input datasets.
+- `results/`, `hidden_states/`, `easy_contexts/`, `uq_results/`: generated outputs.
+
+## Environment
 
 ```bash
 cd /home/yavuz/yavuz/feature_gaps
@@ -22,7 +40,7 @@ conda activate /home/yavuz/miniconda3/envs/TruthTorchLLM
 mkdir -p results uq_results hidden_states easy_contexts
 ```
 
-For `run_model.py`, fill `api_values.env` first:
+Fill `api_values.env` before running `run_model.py`:
 
 ```env
 OPENAI_API_KEY=...
@@ -31,13 +49,12 @@ GOOGLE_CLOUD_PROJECT=...
 HF_HOME=/home/yavuz/yavuz/.cache/huggingface/
 ```
 
-## 1) Run `run_model.py` First
+## Section A: Run Model (Step 1)
 
 Purpose:
-- Generate model outputs and correctness labels over the dataset.
-- This creates the base `.pkl` file consumed by `run_uq.py` and downstream methods.
+- Generates dataset-level outputs consumed by all later stages.
 
-Command (example 10-sample smoke run):
+Command (paper-style default, 10-sample smoke):
 
 ```bash
 python run_model.py \
@@ -51,15 +68,13 @@ python run_model.py \
   --model_judge gpt-4o-mini
 ```
 
-Output:
-- `./results/run_model_qasper_10.pkl`
+Expected output:
+- `results/run_model_qasper_10.pkl`
 
-## 2) Run `run_uq.py`
+## Section B: TruthTorchLM Baseline UQ (Step 2)
 
 Purpose:
-- Run TruthTorchLM uncertainty methods over the `run_model.py` output.
-
-Command:
+- Runs baseline uncertainty methods on step-1 output.
 
 ```bash
 python run_uq.py \
@@ -73,16 +88,15 @@ python run_uq.py \
   --entailment_device cuda:0
 ```
 
-Output:
-- `./uq_results/run_uq_qasper_10.pkl`
+Expected output:
+- `uq_results/run_uq_qasper_10.pkl`
 
-## 3) Run `easy_context.py`
+## Section C: Easy-Context Generation (Step 3)
 
 Purpose:
-- Build easy-context perturbation text from `(question, ground_truths)`.
-- This creates the file used by `extract_hidden_states.py --perturb_modes easy_context`.
+- Creates context perturbation strings used by hidden-state extraction.
 
-Command (real-style default: Llama-3.1-8B + qasper_train):
+Command (real-run default style):
 
 ```bash
 python easy_context.py \
@@ -95,16 +109,14 @@ python easy_context.py \
   --save_name llama8b_qasper_train_easy_contexts.pkl
 ```
 
-Output:
-- `./easy_contexts/llama8b_qasper_train_easy_contexts.pkl`
+Expected output:
+- `easy_contexts/llama8b_qasper_train_easy_contexts.pkl`
 
-## 4) Run `extract_hidden_states.py`
+## Section D: Hidden-State Extraction (Step 4)
 
-Purpose:
-- Create hidden-state artifacts for feature-gaps and SAPLMA runs.
-- Run it multiple times for required perturbation settings.
+Run all four variants.
 
-### 4.1 Regular (base, with probs/all states)
+### D.1 Regular (base)
 
 ```bash
 python extract_hidden_states.py \
@@ -120,7 +132,7 @@ python extract_hidden_states.py \
   --all_states
 ```
 
-### 4.2 Context perturbation
+### D.2 Context
 
 ```bash
 python extract_hidden_states.py \
@@ -134,7 +146,7 @@ python extract_hidden_states.py \
   --sample_num 10
 ```
 
-### 4.3 Honesty perturbation
+### D.3 Honesty
 
 ```bash
 python extract_hidden_states.py \
@@ -148,7 +160,7 @@ python extract_hidden_states.py \
   --sample_num 10
 ```
 
-### 4.4 Easy-context perturbation
+### D.4 Easy-context
 
 ```bash
 python extract_hidden_states.py \
@@ -164,12 +176,7 @@ python extract_hidden_states.py \
   --sample_num 10
 ```
 
-## 5) Run `run_feature_gaps.py`
-
-Purpose:
-- Train/use feature-gaps method from hidden-state artifacts.
-
-Command:
+## Section E: Feature-Gaps (Step 5)
 
 ```bash
 python run_feature_gaps.py \
@@ -193,12 +200,7 @@ python run_feature_gaps.py \
   --save_name feature_gaps_qasper_10.pkl
 ```
 
-## 6) Run `run_saplma.py`
-
-Purpose:
-- Run SAPLMA on extracted hidden states.
-
-Command:
+## Section F: SAPLMA (Step 6)
 
 ```bash
 python run_saplma.py \
@@ -213,12 +215,7 @@ python run_saplma.py \
   --save_name saplma_qasper_10.pkl
 ```
 
-## 7) Run `run_lookbacklens.py`
-
-Purpose:
-- Run LookbackLens using attention-based features.
-
-Command:
+## Section G: LookbackLens (Step 7)
 
 ```bash
 python run_lookbacklens.py \
@@ -231,9 +228,14 @@ python run_lookbacklens.py \
   --save_name lookbacklens_qasper_10.pkl
 ```
 
-## Final Check
+## Validation Status (This Machine)
+
+I attempted the README order before finalizing this document:
+- `run_model.py` starts correctly, but this runtime reports CUDA initialization errors and falls back to CPU, making generation+judge stages very slow.
+- For reproducible paper runs, execute on a proper CUDA-enabled machine.
+
+## Final Output Check
 
 ```bash
 ls -lh ./results ./easy_contexts ./hidden_states ./uq_results
 ```
-
