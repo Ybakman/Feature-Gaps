@@ -2,18 +2,10 @@
 
 ![Feature-Gaps Overview](figure.png)
 
-Official code for the paper experiments on uncertainty estimation in RAG-style QA using:
-- baseline TruthTorchLM UQ methods,
-- `feature_gaps`,
-- SAPLMA,
-- LookbackLens.
-
-This repository is organized as a strict step-by-step pipeline.
-
 ## Repository Layout
 
 - `run_model.py`: generates base model outputs + correctness labels.
-- `run_uq.py`: runs TruthTorchLM uncertainty methods over step-1 output.
+- `run_uq.py`: runs baseline UQ methods.
 - `easy_context.py`: generates easy-context perturbation text.
 - `extract_hidden_states.py`: produces hidden-state artifacts for downstream methods.
 - `run_feature_gaps.py`: runs the feature-gaps method.
@@ -34,19 +26,11 @@ conda activate feature-gaps
 mkdir -p results uq_results hidden_states easy_contexts
 ```
 
-Notes:
-- `setup_conda.sh` creates a new conda env and installs all required packages.
-- Default env name is `feature-gaps`.
-- To change env name: `ENV_NAME=myenv bash setup_conda.sh`
-- To install CPU-only PyTorch: `WITH_CUDA=0 bash setup_conda.sh`
-
-Fill `api_values.env` before running `run_model.py`:
-
 ```env
 OPENAI_API_KEY=...
 GEMINI_API_KEY=...
 GOOGLE_CLOUD_PROJECT=...
-HF_HOME=/home/yavuz/yavuz/.cache/huggingface/
+HF_HOME=
 ```
 
 ## Section A: Run Model (Step 1)
@@ -71,10 +55,10 @@ python run_model.py \
 Expected output:
 - `results/run_model_llama8b_qasper_10.pkl`
 
-## Section B: TruthTorchLM Baseline UQ (Step 2)
+## Section B: Baseline UQ Methods (Step 2)
 
 Purpose:
-- Runs baseline uncertainty methods on step-1 output.
+- Runs baseline uncertainty methods
 
 ```bash
 python run_uq.py \
@@ -228,14 +212,3 @@ python run_lookbacklens.py \
   --save_name lookbacklens_llama8b_qasper_10.pkl
 ```
 
-## Validation Status (This Machine)
-
-I attempted the README order before finalizing this document:
-- `run_model.py` starts correctly, but this runtime reports CUDA initialization errors and falls back to CPU, making generation+judge stages very slow.
-- For reproducible paper runs, execute on a proper CUDA-enabled machine.
-
-## Final Output Check
-
-```bash
-ls -lh ./results ./easy_contexts ./hidden_states ./uq_results
-```
