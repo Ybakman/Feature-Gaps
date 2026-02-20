@@ -30,7 +30,6 @@ mkdir -p results uq_results hidden_states easy_contexts
 OPENAI_API_KEY=...
 GEMINI_API_KEY=...
 GOOGLE_CLOUD_PROJECT=...
-HF_HOME=
 ```
 
 ## Section A: Run Model (Step 1)
@@ -211,4 +210,6 @@ python run_lookbacklens.py \
   --output_path ./uq_results \
   --save_name lookbacklens_llama8b_qasper_10.pkl
 ```
+
+Refactor note: This repository has been heavily refactored by Codex GPT-5.3
 
