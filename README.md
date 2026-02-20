@@ -1,6 +1,6 @@
 # Uncertainty as Feature Gaps: Epistemic Uncertainty Quantification of LLMs in Contextual Question-Answering ICLR-2026
 
-![Feature-Gaps Overview](assets/figure.png)
+![Feature-Gaps Overview](figure.png)
 
 Official code for the paper experiments on uncertainty estimation in RAG-style QA using:
 - baseline TruthTorchLM UQ methods,
